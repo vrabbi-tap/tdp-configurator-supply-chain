@@ -21,13 +21,12 @@ ytt -f supplychain/ -f values.yaml > rendered-supply-chain.yaml
 ```  
 5. Apply the manifests to the cluster
 ```bash
-kubectl apply -f rbac.yaml
 kubectl apply -f templates/
 kubectl apply -f rendered-supply-chain.yaml
 ```  
 6. Now you can create the supply chain like before with 2 small differences from the documented workload:
 * you must set the label **apps.tanzu.vmware.com/workload-type: "tdp"** on the workload as that is this supply chains selector
-* you can omit the source.image field and the **BP_NODE_RUN_SCRIPTS** and **TPB_CONFIG** env vars as they will be defaulted by the supply chain.
+* you can omit the **source.image** field and the **BP_NODE_RUN_SCRIPTS** and **TPB_CONFIG** env vars as they will be defaulted by the supply chain.
 
 ## Example Workload YAML
 ```yaml
