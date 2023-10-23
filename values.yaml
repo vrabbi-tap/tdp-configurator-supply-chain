@@ -1,0 +1,12 @@
+#@data/values
+---
+namespace: tdp
+service_account: default
+registry:
+  ca_cert_data: ""
+  repository: "tap/images"
+  server: "harbor.vrabbi.cloud"
+builder: default
+tbs_dependency_mode: lite #! can be lite or full
+#! tdp_configurator_bundle: registry.tanzu.vmware.com/tanzu-application-platform/tap-packages@sha256:bea2f5bec5c5102e2a69a4c5047fae3d51f29741911cf5bb588893aa4e03ca27
+tdp_configurator_bundle: harbor.vrabbi.cloud/tap/tap-packages@sha256:bea2f5bec5c5102e2a69a4c5047fae3d51f29741911cf5bb588893aa4e03ca27

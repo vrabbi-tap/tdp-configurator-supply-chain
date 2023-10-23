@@ -1,0 +1,46 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterConfigTemplate
+metadata:
+  name: tdp-overlay-template
+spec:
+  configPath: .data
+  lifecycle: mutable
+  ytt: |
+    #@ load("@ytt:data", "data")
+    #@ load("@ytt:base64", "base64")
+    #@ load("@ytt:yaml", "yaml")
+    #@ if data.values.params.tbs_dependency_mode == "lite":
+    #@    node_path = "/layers/tanzu-buildpacks_node-engine-lite/node/bin/node"
+    #@ else:   
+    #@    node_path = "/layers/tanzu-buildpacks_node-engine/node/bin/node"
+    #@ end
+    #@ def overlay():
+    #@yaml/text-templated-strings
+    content: |
+      #@ load("@ytt:overlay", "overlay")
+      #@overlay/match by=overlay.subset({"kind": "Deployment", "metadata": {"name": "server", "namespace": "tap-gui"}}), expects="1+"
+      ---
+      spec:
+        template:
+          spec:
+            containers:
+              #@overlay/match by=overlay.subset({"name": "backstage"}),expects="1+"
+              #@overlay/match-child-defaults missing_ok=True
+              - image: (@= data.values.image @)
+              #@overlay/replace
+                args:
+                - -c
+                - |
+                  export KUBERNETES_SERVICE_ACCOUNT_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+                  exec (@= node_path @) portal/dist/packages/backend  \
+                  --config=portal/app-config.yaml \
+                  --config=portal/runtime-config.yaml \
+                  --config=/etc/app-config/app-config.yaml
+    #@ end
+
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: tdp-app-image-overlay-secret
+    data:
+      tdp-app-image-overlay.yaml: #@ base64.encode(overlay()["content"])

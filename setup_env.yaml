@@ -1,0 +1,52 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    apps.tanzu.vmware.com/tap-ns: ""
+  name: #@ data.values.namespace
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tdp-secret-role
+  namespace: #@ data.values.namespace
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - tdp-app-image-overlay-secret
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - list
+  - get
+  - watch
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tdp-secret-role-binding
+  namespace: #@ data.values.namespace
+subjects:
+- kind: ServiceAccount
+  name: #@ data.values.service_account
+  namespace: #@ data.values.namespace
+roleRef:
+  kind: Role
+  name: tdp-secret-role
+  apiGroup: rbac.authorization.k8s.io

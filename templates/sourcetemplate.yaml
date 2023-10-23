@@ -1,0 +1,44 @@
+apiVersion: carto.run/v1alpha1
+kind: ClusterSourceTemplate
+metadata:
+  name: tdp-source-template
+spec:
+  healthRule:
+    singleConditionType: Ready
+  lifecycle: mutable
+  params:
+  - default: default
+    name: serviceAccount
+  revisionPath: .status.artifact.revision
+  urlPath: .status.artifact.url
+  ytt: |
+    #@ load("@ytt:data", "data")
+    
+    #@ def merge_labels(fixed_values):
+    #@   labels = {}
+    #@   if hasattr(data.values.workload.metadata, "labels"):
+    #@     exclusions = ["kapp.k14s.io/app", "kapp.k14s.io/association"]
+    #@     for k,v in dict(data.values.workload.metadata.labels).items():
+    #@       if k not in exclusions:
+    #@         labels[k] = v
+    #@       end
+    #@     end
+    #@   end
+    #@   labels.update(fixed_values)
+    #@   return labels
+    #@ end
+    
+    ---
+    apiVersion: source.apps.tanzu.vmware.com/v1alpha1
+    kind: ImageRepository
+    metadata:
+      name: #@ data.values.workload.metadata.name
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "source" })
+    spec:
+      serviceAccountName: #@ data.values.params.serviceAccount
+      interval: 10m0s
+      #@ if hasattr(data.values.workload.spec, "source") and hasattr(data.values.workload.spec.source, "image"):
+      image: #@ data.values.workload.spec.source.image
+      #@ else:
+      image: #@ data.values.params.tdp_configurator_bundle
+      #@ end
