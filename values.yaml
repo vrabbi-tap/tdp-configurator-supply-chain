@@ -1,12 +1,20 @@
 #@data/values
 ---
+#! This is the namespace where you will be applying the workload
 namespace: tdp
+#! the service account the supply chain will use to reconcile the workload
 service_account: default
 registry:
-  ca_cert_data: ""
-  repository: "tap/images"
+  #! leave empty if your registry has a public CA otherwise fill this in with you registries CA
+  ca_cert_data: "" 
+  #! the path under which to store the image. the image itself with be named like standard TAP workloads based on the name and namespace of the workload under this path
+  repository: "tap/images" 
+  #! The registry FQDN you want to push the image to
   server: "harbor.vrabbi.cloud"
+#! the TBS builder to use when building the TDP image
 builder: default
-tbs_dependency_mode: lite #! can be lite or full
-#! tdp_configurator_bundle: registry.tanzu.vmware.com/tanzu-application-platform/tap-packages@sha256:bea2f5bec5c5102e2a69a4c5047fae3d51f29741911cf5bb588893aa4e03ca27
-tdp_configurator_bundle: harbor.vrabbi.cloud/tap/tap-packages@sha256:bea2f5bec5c5102e2a69a4c5047fae3d51f29741911cf5bb588893aa4e03ca27
+#! this can be set to lite or full - this is needed, because the overlay which sets the run command is different depending on which type of dependencies are used
+tbs_dependency_mode: lite
+#! You can pull this value as describe in the docs, or using the following ommand which has been tested on linux and does not require downloading files:
+#! TDP_IMAGE=$(imgpkg describe -b $(kubectl get -n tap-install $(kubectl get package -n tap-install --field-selector spec.refName=tpb.tanzu.vmware.com -o name) -o jsonpath={.spec.template.spec.fetch[0].imgpkgBundle.image}) -o yaml --tty=true | grep -A 1 "kbld.carvel.dev/id: harbor-repo.vmware.com/esback/configurator" | grep "image: " | sed 's/\simage: //g')
+tdp_configurator_bundle: registry.tanzu.vmware.com/tanzu-application-platform/tap-packages@sha256:bea2f5bec5c5102e2a69a4c5047fae3d51f29741911cf5bb588893aa4e03ca27
