@@ -60,7 +60,7 @@ apiVersion: secretgen.carvel.dev/v1alpha1
 kind: SecretExport
 metadata:
   name: tdp-app-image-overlay-secret
-  nameapace: $TDP_CONFIGURATOR_NAMESPACE
+  namespace: $TDP_CONFIGURATOR_NAMESPACE
 spec:
   toNamespace: tap-install
 EOF
