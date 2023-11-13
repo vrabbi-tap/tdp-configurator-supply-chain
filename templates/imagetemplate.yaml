@@ -29,6 +29,7 @@ spec:
   ytt: |
     #@ load("@ytt:data", "data")
     #@ load("@ytt:regexp", "regexp")
+    #@ load("@ytt:base64", "base64")
 
     #@ def merge_labels(fixed_values):
     #@   labels = {}
@@ -67,6 +68,9 @@ spec:
     #@   end
     #@   if env.name == "TPB_CONFIG":
     #@     tpb_config = env.value
+    #@   end
+    #@   if env.name == "TPB_PLUGINS":
+    #@     tpb_config_string = base64.encode(env.value)
     #@   end
     #@ end
     
