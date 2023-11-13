@@ -7,25 +7,25 @@ spec:
     multiMatch:
       healthy:
         matchConditions:
-        - status: "True"
-          type: BuilderReady
-        - status: "True"
-          type: Ready
+          - status: "True"
+            type: BuilderReady
+          - status: "True"
+            type: Ready
       unhealthy:
         matchConditions:
-        - status: "False"
-          type: BuilderReady
-        - status: "False"
-          type: Ready
+          - status: "False"
+            type: BuilderReady
+          - status: "False"
+            type: Ready
   imagePath: .status.latestImage
   lifecycle: mutable
   params:
-  - default: default
-    name: serviceAccount
-  - default: default
-    name: clusterBuilder
-  - name: registry
-    default: {}
+    - default: default
+      name: serviceAccount
+    - default: default
+      name: clusterBuilder
+    - name: registry
+      default: {}
   ytt: |
     #@ load("@ytt:data", "data")
     #@ load("@ytt:regexp", "regexp")
@@ -59,18 +59,25 @@ spec:
     #@ bp_node_run_scripts = "set-tpb-config,portal:pack"
     #@ tpb_config = "/tmp/tpb-config.yaml"
 
-    #@ for env in data.values.workload.spec.build.env:
-    #@   if env.name == "TPB_CONFIG_STRING":
-    #@     tpb_config_string = env.value
+    #@ if "env" in data.values.workload.spec.build:
+    #@   for env in data.values.workload.spec.build.env:
+    #@     if env.name == "TPB_CONFIG_STRING":
+    #@       tpb_config_string = env.value
+    #@     end
+    #@     if env.name == "BP_NODE_RUN_SCRIPTS":
+    #@       bp_node_run_scripts = env.value
+    #@     end
+    #@     if env.name == "TPB_CONFIG":
+    #@       tpb_config = env.value
+    #@     end
     #@   end
-    #@   if env.name == "BP_NODE_RUN_SCRIPTS":
-    #@     bp_node_run_scripts = env.value
-    #@   end
-    #@   if env.name == "TPB_CONFIG":
-    #@     tpb_config = env.value
-    #@   end
-    #@   if env.name == "TPB_PLUGINS":
-    #@     tpb_config_string = base64.encode(env.value)
+    #@ end
+    
+    #@ if "params" in data.values.workload.spec:
+    #@   for param in data.values.workload.spec.params:
+    #@     if param.name == "tpb_plugins":
+    #@       tpb_config_string = base64.encode(param.value)
+    #@     end
     #@   end
     #@ end
     

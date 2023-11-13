@@ -44,7 +44,7 @@ spec:
       value: YXBwOgogIHBsdWdpbnM6CiAgICAtIG5hbWU6ICdAdm13YXJlLXRhbnp1L3RkcC1wbHVnaW4tdGVjaGluc2lnaHRzJwogICAgICB2ZXJzaW9uOiAnMC4wLjInCiAgICAtIG5hbWU6ICdAdm13YXJlLXRhbnp1L3RkcC1wbHVnaW4taG9tZScKICAgICAgdmVyc2lvbjogJzAuMC4yJwogICAgLSBuYW1lOiAnQHZtd2FyZS10YW56dS90ZHAtcGx1Z2luLXN0YWNrLW92ZXJmbG93JwogICAgICB2ZXJzaW9uOiAnMC4wLjInCiAgICAtIG5hbWU6ICdAdm13YXJlLXRhbnp1L3RkcC1wbHVnaW4tZ2l0aHViLWFjdGlvbnMnCiAgICAgIHZlcnNpb246ICcwLjAuMicKICAgIC0gbmFtZTogJ0B2bXdhcmUtdGFuenUvdGRwLXBsdWdpbi1wcm9tZXRoZXVzJwogICAgICB2ZXJzaW9uOiAnMC4wLjInCiAgICAtIG5hbWU6ICdAdm13YXJlLXRhbnp1L3RkcC1wbHVnaW4tYmFja3N0YWdlLWdyYWZhbmEnCiAgICAgIHZlcnNpb246ICcwLjAuMicKYmFja2VuZDoKICBwbHVnaW5zOgogICAgLSBuYW1lOiAnQHZtd2FyZS10YW56dS90ZHAtcGx1Z2luLXRlY2hpbnNpZ2h0cy1iYWNrZW5kJwogICAgICB2ZXJzaW9uOiAnMC4wLjInCiAgICAtIG5hbWU6ICdAdm13YXJlLXRhbnp1L3RkcC1wbHVnaW4tbGRhcC1iYWNrZW5kJwogICAgICB2ZXJzaW9uOiAnMS4wLjAnCg==
 ```
 
-Alternatively, you can use the TPB_PLUGINS environment variable to specify the plugin configuration in plain text. This allows you to directly edit your plugin configuration in a GitOps repo, without the need for base64-encoding.
+Alternatively, you can use the `tpb_plugins` parameter to specify the plugin configuration in plain text. This allows you to directly edit your plugin configuration in a GitOps repo, without the need for base64-encoding.
 ```yaml
 apiVersion: carto.run/v1alpha1
 kind: Workload
@@ -54,10 +54,9 @@ metadata:
     apps.tanzu.vmware.com/workload-type: tdp
   name: tdp-configurator
 spec:
-  build:
-    env:
-    - name: TPB_PLUGINS
-      value: -
+  params:
+    - name: tpb_plugins
+      value: |
         app:
           plugins:
             - name: '@vmware-tanzu/tdp-plugin-techinsights'
